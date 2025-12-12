@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Icon } from './Icons';
 
@@ -11,6 +12,7 @@ interface Card3DProps {
   likeCount: number;
   isLiked?: boolean;
   onToggleLike?: (id: string) => void;
+  onFlipAttempt?: () => boolean | Promise<boolean>; // New prop to check permission
 }
 
 const Card3D: React.FC<Card3DProps> = ({ 
@@ -22,7 +24,8 @@ const Card3D: React.FC<Card3DProps> = ({
   description,
   likeCount = 0,
   isLiked = false,
-  onToggleLike
+  onToggleLike,
+  onFlipAttempt
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -49,8 +52,22 @@ const Card3D: React.FC<Card3DProps> = ({
     }
   }, []);
 
-  const handleFlip = () => {
-    setIsFlipped(!isFlipped);
+  const handleFlip = async () => {
+    if (isFlipped) {
+      // Always allow flipping back to image
+      setIsFlipped(false);
+      return;
+    }
+
+    // If there is a permission check provided, run it
+    if (onFlipAttempt) {
+      const allowed = await onFlipAttempt();
+      if (!allowed) {
+        return; // Block flip if not allowed
+      }
+    }
+
+    setIsFlipped(true);
   };
 
   const handleLikeClick = (e: React.MouseEvent) => {

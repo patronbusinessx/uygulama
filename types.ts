@@ -36,6 +36,10 @@ export interface User {
   membershipTier: 'free' | 'pro'; // Added Membership Tier
   isBanned?: boolean;
   savedPostIds: string[]; // List of IDs of posts liked/saved by the user
+  
+  // Usage Limits
+  dailyUsageCount?: number;
+  lastUsageDate?: string; // ISO Date String (YYYY-MM-DD)
 }
 
 export interface Post {

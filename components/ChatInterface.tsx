@@ -1,7 +1,9 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Icon } from './Icons';
 import { Message, GeminiModel } from '../types';
 import { streamGeminiResponse, generateImageFromText } from '../services/geminiService';
+import { authService } from '../services/authService';
 
 const SUGGESTED_PROMPTS = [
   "A cyberpunk city street at night with neon lights",
@@ -69,8 +71,49 @@ const ChatInterface: React.FC = () => {
     });
   };
 
+  // Helper to check if settings are non-default
+  const isSettingsModified = stylePreset !== 'None' || negativePrompt.trim() !== '' || aspectRatio !== '1:1';
+
+  const resetSettings = () => {
+    setAspectRatio('1:1');
+    setStylePreset('None');
+    setNegativePrompt('');
+  };
+
   const handleSendMessage = async () => {
     if ((!inputValue.trim() && !selectedImage) || isLoading) return;
+
+    // --- Usage Limit Check ---
+    const user = authService.getCurrentUser();
+    
+    if (user) {
+        // Registered User Check
+        const { allowed } = authService.checkAndIncrementUsage(user.id);
+        if (!allowed) {
+             setMessages(prev => [...prev, {
+                 id: Date.now().toString(),
+                 role: 'model',
+                 text: "⚠️ **Daily Limit Reached**\n\nYou have reached your daily limit for AI interactions on the Free plan. Upgrade to **Pro** for unlimited access.",
+                 timestamp: Date.now(),
+             }]);
+             return;
+        }
+    } else {
+        // Guest Limit Check (5 interactions)
+        const GUEST_KEY = 'neura_guest_chat_usage';
+        const currentUsage = parseInt(localStorage.getItem(GUEST_KEY) || '0');
+        if (currentUsage >= 5) {
+             setMessages(prev => [...prev, {
+                 id: Date.now().toString(),
+                 role: 'model',
+                 text: "🔒 **Guest Limit Reached**\n\nYou've reached the limit for guest interactions. Please **Log In** or **Sign Up** to continue using NeuraFlow AI.",
+                 timestamp: Date.now(),
+             }]);
+             return;
+        }
+        localStorage.setItem(GUEST_KEY, (currentUsage + 1).toString());
+    }
+    // -------------------------
 
     const newUserMessage: Message = {
       id: Date.now().toString(),
@@ -106,7 +149,7 @@ const ChatInterface: React.FC = () => {
         // Image Generation Mode
         let prompt = newUserMessage.text || "A surprise image";
         
-        // Append style and negative prompt
+        // Append style and negative prompt for enhanced generation
         if (stylePreset && stylePreset !== 'None') {
             prompt += `, ${stylePreset} style, high quality, detailed`;
         }
@@ -162,12 +205,25 @@ const ChatInterface: React.FC = () => {
       }
 
     } catch (error: any) {
-      console.error(error);
-      let errorMessage = "I'm sorry, I encountered an error while processing your request.";
+      console.error("AI Request Failed:", error);
+      let errorMessage = "I'm sorry, I encountered an unexpected error. Please try again.";
       
-      // Handle safety blocks specifically
-      if (error.message && (error.message.includes("SAFETY") || error.message.includes("blocked"))) {
-          errorMessage = "This content was blocked by safety filters. Please try a different prompt.";
+      // Normalize error message for checking
+      const errString = (error.message || error.toString()).toLowerCase();
+
+      // Granular Error Feedback based on error content
+      if (errString.includes("safety") || errString.includes("blocked") || errString.includes("harm")) {
+          errorMessage = "🛡️ **Safety Filter Triggered**\n\nThe content was flagged by safety settings. Please try a different prompt or description.";
+      } else if (errString.includes("quota") || errString.includes("429") || errString.includes("resource exhausted")) {
+          errorMessage = "⏳ **Usage Limit Reached**\n\nThe AI service is currently busy or quota exceeded. Please try again in a few minutes.";
+      } else if (errString.includes("network") || errString.includes("fetch") || errString.includes("offline")) {
+          errorMessage = "🌐 **Connection Error**\n\nUnable to reach the AI service. Please check your internet connection.";
+      } else if (errString.includes("503") || errString.includes("overloaded") || errString.includes("busy")) {
+          errorMessage = "🔥 **High Traffic**\n\nThe model is currently experiencing high load. Please retry shortly.";
+      } else if (errString.includes("api key") || errString.includes("403") || errString.includes("permission")) {
+          errorMessage = "🔑 **Access Error**\n\nThere seems to be an issue with the API configuration.";
+      } else if (errString.includes("candidate")) {
+          errorMessage = "⚠️ **Generation Failed**\n\nThe model could not generate a valid response for this input.";
       }
 
       setMessages((prev) => [
@@ -269,9 +325,19 @@ const ChatInterface: React.FC = () => {
                          <Icon name="Sliders" className="w-4 h-4" />
                          Generation Settings
                      </h3>
-                     <button onClick={() => setShowSettings(false)} className="text-slate-400 hover:text-white">
-                         <Icon name="X" className="w-4 h-4" />
-                     </button>
+                     <div className="flex items-center gap-2">
+                        {isSettingsModified && (
+                          <button 
+                            onClick={resetSettings}
+                            className="text-[10px] text-red-400 hover:text-red-300 font-bold uppercase tracking-wider px-2 py-1 rounded hover:bg-red-500/10 transition-colors"
+                          >
+                            Reset
+                          </button>
+                        )}
+                        <button onClick={() => setShowSettings(false)} className="text-slate-400 hover:text-white">
+                            <Icon name="X" className="w-4 h-4" />
+                        </button>
+                     </div>
                  </div>
                  
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -371,17 +437,24 @@ const ChatInterface: React.FC = () => {
             
             {/* Settings Toggle (Only in Image Mode) */}
             {isImageMode && (
-                <button
-                    onClick={() => setShowSettings(!showSettings)}
-                    className={`p-3 rounded-xl transition-all duration-300 ${
-                        showSettings 
-                        ? 'text-cyan-400 bg-cyan-500/10' 
-                        : 'text-slate-400 hover:text-cyan-400 hover:bg-slate-700/50'
-                    }`}
-                    title="Advanced Settings"
-                >
-                    <Icon name="Sliders" className="w-6 h-6" />
-                </button>
+                <div className="relative">
+                  <button
+                      onClick={() => setShowSettings(!showSettings)}
+                      className={`p-3 rounded-xl transition-all duration-300 ${
+                          showSettings 
+                          ? 'text-cyan-400 bg-cyan-500/10' 
+                          : isSettingsModified 
+                            ? 'text-cyan-400 bg-slate-800 hover:bg-slate-700'
+                            : 'text-slate-400 hover:text-cyan-400 hover:bg-slate-700/50'
+                      }`}
+                      title="Advanced Settings"
+                  >
+                      <Icon name="Sliders" className="w-6 h-6" />
+                  </button>
+                  {isSettingsModified && !showSettings && (
+                      <span className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_rgba(34,211,238,0.8)] border border-slate-900"></span>
+                  )}
+                </div>
             )}
 
              {/* File Upload Button (Disabled in Image Mode) */}

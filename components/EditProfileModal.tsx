@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { User } from '../types';
 import { Icon } from './Icons';
 import { authService } from '../services/authService';
@@ -28,6 +29,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, on
   const [status, setStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (isOpen) {
       // Reset fields on open
@@ -43,6 +46,22 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, on
   }, [isOpen, user]);
 
   if (!isOpen) return null;
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+        if (file.size > 2 * 1024 * 1024) { // 2MB limit
+            setStatus({ type: 'error', message: 'Image size too large. Max 2MB.' });
+            return;
+        }
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setAvatar(reader.result as string);
+            setStatus({ type: null, message: '' }); // Clear any previous errors
+        };
+        reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,13 +172,38 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, on
             
             {activeTab === 'general' && (
               <>
-                <div className="flex justify-center mb-4">
-                  <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-br from-cyan-400 to-purple-500">
-                     <img src={avatar || user.avatar} alt="Avatar" className="w-full h-full rounded-full bg-slate-900 object-cover" />
-                  </div>
+                <div className="space-y-4">
+                    <label className="block text-sm font-medium text-slate-300 text-center">Profile Picture</label>
+                    <div className="flex flex-col items-center justify-center gap-3">
+                        <div 
+                            className="relative w-28 h-28 rounded-full p-1 bg-gradient-to-br from-cyan-400 to-purple-500 cursor-pointer group"
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                             <img src={avatar || user.avatar} alt="Avatar" className="w-full h-full rounded-full bg-slate-900 object-cover" />
+                             <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                                <Icon name="UploadCloud" className="w-8 h-8 text-white" />
+                             </div>
+                        </div>
+                        
+                        <button 
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="text-sm text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1"
+                        >
+                            <Icon name="UploadCloud" className="w-4 h-4" />
+                            Change Photo
+                        </button>
+                        <input 
+                            type="file" 
+                            ref={fileInputRef} 
+                            className="hidden" 
+                            accept="image/*" 
+                            onChange={handleAvatarUpload} 
+                        />
+                    </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 mt-6">
                   <label className="block text-sm font-medium text-slate-300">Username</label>
                   <div className="relative">
                     <input 
@@ -170,22 +214,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, on
                     />
                     <div className="absolute left-3 top-3.5 text-slate-500">
                       <Icon name="Person" className="w-5 h-5" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-300">Avatar URL</label>
-                  <div className="relative">
-                    <input 
-                      type="text" 
-                      value={avatar}
-                      onChange={(e) => setAvatar(e.target.value)}
-                      placeholder="https://..."
-                      className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 pl-10"
-                    />
-                    <div className="absolute left-3 top-3.5 text-slate-500">
-                      <Icon name="Image" className="w-5 h-5" />
                     </div>
                   </div>
                 </div>

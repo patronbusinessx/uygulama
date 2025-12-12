@@ -21,7 +21,9 @@ export const authService = {
         role: 'admin',
         membershipTier: 'pro', // Admin is PRO by default
         isBanned: false,
-        savedPostIds: []
+        savedPostIds: [],
+        dailyUsageCount: 0,
+        lastUsageDate: new Date().toISOString().split('T')[0]
       };
       users.push(adminUser);
       localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
@@ -54,7 +56,9 @@ export const authService = {
       role: 'user', // Default role
       membershipTier: 'free', // Default tier is FREE
       isBanned: false,
-      savedPostIds: []
+      savedPostIds: [],
+      dailyUsageCount: 0,
+      lastUsageDate: new Date().toISOString().split('T')[0]
     };
 
     users.push(newUser);
@@ -98,6 +102,52 @@ export const authService = {
   // Logout
   logout: () => {
     localStorage.removeItem(SESSION_STORAGE_KEY);
+  },
+
+  // --- USAGE TRACKING ---
+  
+  // Checks if user can perform an action (view prompt) and increments count
+  checkAndIncrementUsage: (userId: string): { allowed: boolean; reason?: 'limit_reached' } => {
+    const users = authService.getUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    
+    if (userIndex === -1) return { allowed: false };
+    
+    const user = users[userIndex];
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Pro users have no limits
+    if (user.membershipTier === 'pro') {
+        return { allowed: true };
+    }
+
+    // Reset count if it's a new day
+    if (user.lastUsageDate !== today) {
+        user.dailyUsageCount = 0;
+        user.lastUsageDate = today;
+    }
+
+    // Free Tier Limit: 10
+    const FREE_LIMIT = 10;
+    
+    if ((user.dailyUsageCount || 0) >= FREE_LIMIT) {
+        return { allowed: false, reason: 'limit_reached' };
+    }
+
+    // Increment
+    user.dailyUsageCount = (user.dailyUsageCount || 0) + 1;
+    
+    // Save
+    users[userIndex] = user;
+    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+    
+    // Update Session
+    const currentUser = authService.getCurrentUser();
+    if (currentUser && currentUser.id === userId) {
+        authService.updateSessionUser(user);
+    }
+
+    return { allowed: true };
   },
 
   // ADMIN METHODS

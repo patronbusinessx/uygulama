@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { GeminiModel } from '../types';
 
@@ -67,20 +68,34 @@ export const streamGeminiResponse = async function* (
 
 interface ImageGenerationOptions {
   aspectRatio?: string;
+  model?: string;
+  imageSize?: string;
 }
 
 export const generateImageFromText = async (prompt: string, options?: ImageGenerationOptions): Promise<string> => {
   const ai = getAiClient();
   try {
-    // Using gemini-2.5-flash-image for standard image generation
+    // Default to flash, but allow override for Pro (Nano Banana Pro)
+    const modelToUse = options?.model || 'gemini-2.5-flash-image';
+    
+    // Construct config based on model capabilities
+    const imageConfig: any = {};
+    
+    if (options?.aspectRatio) {
+        imageConfig.aspectRatio = options.aspectRatio;
+    }
+
+    // imageSize is only supported by gemini-3-pro-image-preview
+    if (modelToUse === 'gemini-3-pro-image-preview' && options?.imageSize) {
+        imageConfig.imageSize = options.imageSize;
+    }
+
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image',
+      model: modelToUse,
       contents: { parts: [{ text: prompt }] },
       config: {
         safetySettings: SAFETY_SETTINGS,
-        imageConfig: options?.aspectRatio ? {
-            aspectRatio: options.aspectRatio
-        } : undefined
+        imageConfig: imageConfig
       }
     });
     

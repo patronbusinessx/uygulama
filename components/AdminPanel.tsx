@@ -4,6 +4,7 @@ import { User, Post, ContactMessage, UserReport } from '../types';
 import { authService } from '../services/authService';
 import { postService } from '../services/postService';
 import { dataService } from '../services/dataService';
+import { generateImageFromText } from '../services/geminiService';
 import { Icon } from './Icons';
 
 interface AdminPanelProps {
@@ -11,12 +12,22 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'content' | 'inbox'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'content' | 'inbox' | 'exclusive'>('dashboard');
   const [users, setUsers] = useState<User[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [reports, setReports] = useState<UserReport[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Exclusive Generator States
+  const [exclusivePrompt, setExclusivePrompt] = useState('');
+  const [targetUrl, setTargetUrl] = useState(''); 
+  const [exclusiveImage, setExclusiveImage] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [shareStatus, setShareStatus] = useState<'idle' | 'success'>('idle');
+  
+  // Resolution State for Pro Model
+  const [imageSize, setImageSize] = useState<'1K' | '2K' | '4K'>('1K');
 
   useEffect(() => {
     setUsers(authService.getUsers());
@@ -49,6 +60,61 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       postService.deletePost(postId);
       setRefreshTrigger(prev => prev + 1);
     }
+  };
+
+  const handleGenerateExclusive = async () => {
+    if (!exclusivePrompt.trim()) return;
+    setIsGenerating(true);
+    setExclusiveImage(null);
+    setShareStatus('idle');
+
+    try {
+        // Enforce a high-quality "Instagram-like" aesthetic
+        // If a URL is provided, we simulate a "virtual photography" session at that location
+        let modifiers = "masterpiece, best quality, cinematic lighting, hyper-realistic, trending on artstation, highly detailed, dramatic atmosphere, shot on 35mm lens, depth of field";
+        
+        if (targetUrl) {
+            modifiers += ", digital capture, inspired by virtual environment, cyber-photography style";
+        }
+
+        const enhancedPrompt = `${exclusivePrompt}, ${modifiers}`;
+        
+        // Use gemini-3-pro-image-preview for high fidelity and resolution control
+        const imageBase64 = await generateImageFromText(enhancedPrompt, { 
+            aspectRatio: '1:1',
+            model: 'gemini-3-pro-image-preview',
+            imageSize: imageSize
+        });
+        
+        setExclusiveImage(imageBase64);
+    } catch (error) {
+        alert("Generation failed. Please try again.");
+    } finally {
+        setIsGenerating(false);
+    }
+  };
+
+  const handleShareExclusive = () => {
+      if (!exclusiveImage || !exclusivePrompt) return;
+
+      postService.createPost({
+          title: "Admin Exclusive: " + exclusivePrompt.substring(0, 20) + "...",
+          description: targetUrl ? `📸 Virtual Capture from: ${targetUrl} [${imageSize} Resolution]` : `✨ Official Admin Creation. Generated with NeuraFlow Pro Engine (${imageSize}).`,
+          prompt: exclusivePrompt,
+          imageUrl: exclusiveImage,
+          author: currentUser.username,
+          authorId: currentUser.id
+      });
+
+      setShareStatus('success');
+      setTimeout(() => {
+          setExclusiveImage(null);
+          setExclusivePrompt('');
+          setTargetUrl('');
+          setShareStatus('idle');
+          setActiveTab('content'); // Switch to content tab to see it
+          setRefreshTrigger(prev => prev + 1);
+      }, 1500);
   };
 
   const renderDashboard = () => (
@@ -212,6 +278,135 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     </div>
   );
 
+  const renderExclusiveGenerator = () => (
+      <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl border border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.1)] p-8 relative overflow-hidden">
+          {/* Gold Glow Effect */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+          <div className="relative z-10 flex flex-col md:flex-row gap-8">
+              {/* Input Section */}
+              <div className="flex-1 space-y-6">
+                  <div>
+                      <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                          <Icon name="Image" className="w-6 h-6 text-yellow-400" />
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">AI Virtual Photographer</span>
+                      </h2>
+                      <p className="text-slate-400 mt-2 text-sm">
+                          Dispatch an AI agent to a virtual location or URL to capture high-fidelity shots.
+                      </p>
+                  </div>
+
+                  {/* URL Input */}
+                  <div className="space-y-2">
+                     <label className="text-xs font-bold text-yellow-500/80 uppercase tracking-widest">Target Location (URL)</label>
+                     <div className="relative">
+                        <input 
+                            type="text"
+                            value={targetUrl}
+                            onChange={(e) => setTargetUrl(e.target.value)}
+                            placeholder="https://instagram.com/..."
+                            className="w-full bg-black/40 border border-yellow-500/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 placeholder-slate-600 font-mono text-sm"
+                        />
+                        <div className="absolute right-3 top-3 text-yellow-500/50">
+                            <Icon name="Explore" className="w-5 h-5" />
+                        </div>
+                     </div>
+                  </div>
+
+                   {/* Resolution Selector (Admin Exclusive Feature) */}
+                   <div className="space-y-2">
+                      <label className="text-xs font-bold text-yellow-500/80 uppercase tracking-widest">Output Resolution</label>
+                      <div className="flex gap-2">
+                          {['1K', '2K', '4K'].map((size) => (
+                              <button
+                                  key={size}
+                                  onClick={() => setImageSize(size as any)}
+                                  className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${
+                                      imageSize === size
+                                      ? 'bg-yellow-500/20 border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                      : 'bg-black/40 border-slate-700 text-slate-500 hover:text-white hover:border-slate-500'
+                                  }`}
+                              >
+                                  {size}
+                              </button>
+                          ))}
+                      </div>
+                  </div>
+
+                  <div className="space-y-2">
+                      <label className="text-xs font-bold text-yellow-500/80 uppercase tracking-widest">Scene Directive</label>
+                      <textarea 
+                          value={exclusivePrompt}
+                          onChange={(e) => setExclusivePrompt(e.target.value)}
+                          placeholder="Describe the shot to capture (e.g., A futuristic golden city...)"
+                          rows={3}
+                          className="w-full bg-black/40 border border-yellow-500/30 rounded-xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 placeholder-slate-600 resize-none font-medium"
+                      />
+                  </div>
+
+                  <button 
+                      onClick={handleGenerateExclusive}
+                      disabled={isGenerating || !exclusivePrompt}
+                      className={`w-full py-4 rounded-xl font-bold text-black uppercase tracking-widest transition-all ${
+                          isGenerating 
+                          ? 'bg-slate-700 cursor-wait' 
+                          : 'bg-gradient-to-r from-yellow-500 to-yellow-300 hover:from-yellow-400 hover:to-yellow-200 shadow-lg shadow-yellow-500/20 hover:scale-[1.02]'
+                      }`}
+                  >
+                      {isGenerating ? (
+                        <span className="flex items-center justify-center gap-2">
+                             <span className="animate-spin rounded-full h-4 w-4 border-2 border-black border-t-transparent"></span>
+                             {targetUrl ? 'Navigating & Capturing...' : 'Rendering 8K Masterpiece...'}
+                        </span>
+                    ) : (
+                        'Dispatch & Capture'
+                    )}
+                  </button>
+              </div>
+
+              {/* Preview Section */}
+              <div className="flex-1 bg-black/40 rounded-2xl border border-slate-700/50 flex items-center justify-center min-h-[300px] relative group overflow-hidden">
+                  {exclusiveImage ? (
+                      <>
+                          <img src={exclusiveImage} alt="Exclusive" className="w-full h-full object-contain" />
+                          <div className="absolute top-4 right-4 bg-yellow-500/90 text-black text-[10px] font-bold px-2 py-1 rounded shadow-lg backdrop-blur-sm">
+                              {imageSize} • PRO
+                          </div>
+                          <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent flex justify-center pb-6">
+                              <button 
+                                  onClick={handleShareExclusive}
+                                  disabled={shareStatus === 'success'}
+                                  className={`px-8 py-3 rounded-full font-bold flex items-center gap-2 transition-all ${
+                                      shareStatus === 'success'
+                                      ? 'bg-emerald-500 text-white'
+                                      : 'bg-white text-black hover:bg-cyan-400 hover:text-black shadow-lg shadow-white/20'
+                                  }`}
+                              >
+                                  {shareStatus === 'success' ? (
+                                      <>
+                                          <Icon name="Check" className="w-5 h-5" />
+                                          Shared to Feed
+                                      </>
+                                  ) : (
+                                      <>
+                                          <Icon name="UploadCloud" className="w-5 h-5" />
+                                          Share to Public Feed
+                                      </>
+                                  )}
+                              </button>
+                          </div>
+                      </>
+                  ) : (
+                      <div className="text-center p-6 text-slate-600">
+                          <Icon name="Image" className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                          <p className="text-sm">Preview area</p>
+                      </div>
+                  )}
+              </div>
+          </div>
+      </div>
+  );
+
   const renderInbox = () => (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* User Reports */}
@@ -295,6 +490,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                 >
                     Inbox
                 </button>
+                <button 
+                   onClick={() => setActiveTab('exclusive')}
+                   className={`flex-1 md:flex-none px-4 py-2 rounded-md text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${activeTab === 'exclusive' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 shadow' : 'text-yellow-500/70 hover:text-yellow-400 hover:bg-yellow-500/10'}`}
+                >
+                    <Icon name="Sparkles" className="w-4 h-4" />
+                    Exclusive
+                </button>
             </div>
         </div>
 
@@ -303,6 +505,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
             {activeTab === 'users' && renderUsersTable()}
             {activeTab === 'content' && renderContentFeed()}
             {activeTab === 'inbox' && renderInbox()}
+            {activeTab === 'exclusive' && renderExclusiveGenerator()}
         </div>
       </div>
     </div>
