@@ -110,56 +110,57 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, on
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
       <div 
-        className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/80 backdrop-blur-xl transition-opacity"
         onClick={onClose}
       ></div>
 
-      <div className="relative w-full max-w-md bg-[#0f172a] border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-lg bg-black border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-fade-in">
         
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            Edit Profile
-          </h2>
+        <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
+          <div className="flex flex-col">
+              <span className="text-[10px] font-mono text-cyan-500 uppercase tracking-[0.3em] mb-1">Identity Management</span>
+              <h2 className="text-3xl font-black text-white tracking-tighter uppercase">Edit Profile</h2>
+          </div>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+            className="p-3 bg-white/5 border border-white/10 rounded-2xl text-slate-400 hover:text-white transition-all"
           >
             <Icon name="X" className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-slate-800">
+        <div className="flex border-b border-white/5 p-2 bg-white/[0.02]">
           <button 
             onClick={() => setActiveTab('general')}
-            className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${
+            className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest transition-all rounded-2xl ${
               activeTab === 'general' 
-                ? 'border-cyan-500 text-cyan-400 bg-slate-800/30' 
-                : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/50'
+                ? 'bg-white text-black shadow-xl' 
+                : 'text-slate-500 hover:text-white hover:bg-white/5'
             }`}
           >
-            General Info
+            General
           </button>
           <button 
             onClick={() => setActiveTab('security')}
-            className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${
+            className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest transition-all rounded-2xl ${
               activeTab === 'security' 
-                ? 'border-cyan-500 text-cyan-400 bg-slate-800/30' 
-                : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/50'
+                ? 'bg-white text-black shadow-xl' 
+                : 'text-slate-500 hover:text-white hover:bg-white/5'
             }`}
           >
-            Security (Email & Password)
+            Security
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto custom-scrollbar">
+        <div className="p-10 overflow-y-auto scrollbar-hide">
           
           {status.message && (
-            <div className={`p-3 mb-4 rounded-lg text-sm border ${
+            <div className={`p-4 mb-8 rounded-2xl text-[10px] font-mono uppercase tracking-widest border ${
               status.type === 'success' 
                 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
                 : 'bg-red-500/10 border-red-500/20 text-red-400'
@@ -168,19 +169,19 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, on
             </div>
           )}
 
-          <form id="edit-profile-form" onSubmit={handleSubmit} className="space-y-5">
+          <form id="edit-profile-form" onSubmit={handleSubmit} className="space-y-10">
             
             {activeTab === 'general' && (
               <>
-                <div className="space-y-4">
-                    <label className="block text-sm font-medium text-slate-300 text-center">Profile Picture</label>
-                    <div className="flex flex-col items-center justify-center gap-3">
+                <div className="space-y-6">
+                    <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block text-center">Neural Avatar</label>
+                    <div className="flex flex-col items-center justify-center gap-6">
                         <div 
-                            className="relative w-28 h-28 rounded-full p-1 bg-gradient-to-br from-cyan-400 to-purple-500 cursor-pointer group"
+                            className="relative w-32 h-32 rounded-full p-1 bg-gradient-to-br from-cyan-400 to-purple-500 cursor-pointer group"
                             onClick={() => fileInputRef.current?.click()}
                         >
-                             <img src={avatar || user.avatar} alt="Avatar" className="w-full h-full rounded-full bg-slate-900 object-cover" />
-                             <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                             <img src={avatar || user.avatar} alt="Avatar" className="w-full h-full rounded-full bg-black object-cover" />
+                             <div className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
                                 <Icon name="UploadCloud" className="w-8 h-8 text-white" />
                              </div>
                         </div>
@@ -188,10 +189,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, on
                         <button 
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
-                            className="text-sm text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1"
+                            className="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest text-cyan-400 hover:bg-white/10 transition-all"
                         >
-                            <Icon name="UploadCloud" className="w-4 h-4" />
-                            Change Photo
+                            Update Visual Data
                         </button>
                         <input 
                             type="file" 
@@ -203,16 +203,16 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, on
                     </div>
                 </div>
 
-                <div className="space-y-2 mt-6">
-                  <label className="block text-sm font-medium text-slate-300">Username</label>
+                <div className="space-y-4">
+                  <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Identity Handle</label>
                   <div className="relative">
                     <input 
                       type="text" 
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 pl-10"
+                      className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all pl-14"
                     />
-                    <div className="absolute left-3 top-3.5 text-slate-500">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500">
                       <Icon name="Person" className="w-5 h-5" />
                     </div>
                   </div>
@@ -222,66 +222,66 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, on
 
             {activeTab === 'security' && (
               <>
-                <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-xs text-yellow-200 mb-2">
-                   Changing email or password requires current password verification.
+                <div className="p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-2xl text-[10px] font-mono text-yellow-500/70 uppercase tracking-widest leading-relaxed">
+                   Authorization required for security protocol changes.
                 </div>
 
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-300">Email Address</label>
+                <div className="space-y-4">
+                  <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Transmission Address</label>
                   <div className="relative">
                     <input 
                       type="email" 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 pl-10"
+                      className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all pl-14"
                     />
-                     <div className="absolute left-3 top-3.5 text-slate-500">
+                     <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500">
                       <Icon name="Contact" className="w-5 h-5" />
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-300">New Password</label>
+                <div className="space-y-4">
+                  <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">New Access Key</label>
                   <div className="relative">
                     <input 
                       type="password" 
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Leave blank to keep current"
-                      className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 pl-10"
+                      placeholder="Leave blank to retain"
+                      className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all pl-14"
                     />
-                    <div className="absolute left-3 top-3.5 text-slate-500">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500">
                       <Icon name="Lock" className="w-5 h-5" />
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-300">Confirm New Password</label>
+                <div className="space-y-4">
+                  <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Confirm Access Key</label>
                   <div className="relative">
                     <input 
                       type="password" 
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                       placeholder="Leave blank to keep current"
-                      className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 pl-10"
+                       placeholder="Leave blank to retain"
+                      className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all pl-14"
                     />
-                    <div className="absolute left-3 top-3.5 text-slate-500">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500">
                       <Icon name="Lock" className="w-5 h-5" />
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-800">
-                   <div className="space-y-2">
-                      <label className="block text-sm font-bold text-white">Current Password (Required)</label>
+                <div className="pt-8 border-t border-white/5">
+                   <div className="space-y-4">
+                      <label className="text-[10px] font-black text-white uppercase tracking-widest ml-1">Current Authorization Key (Required)</label>
                       <input 
                         type="password" 
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        placeholder="Enter current password to save changes"
-                        className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-red-500/50"
+                        placeholder="Enter current key to authorize"
+                        className="w-full bg-black border border-white/20 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/30 transition-all"
                       />
                    </div>
                 </div>
@@ -292,21 +292,21 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, on
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-slate-800 flex justify-end gap-3 bg-slate-900/50">
+        <div className="px-10 py-8 border-t border-white/5 flex justify-end gap-4">
           <button 
             onClick={onClose}
             type="button"
-            className="px-4 py-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium"
+            className="px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-colors"
           >
-            Cancel
+            Abort
           </button>
           <button 
             type="submit"
             form="edit-profile-form"
             disabled={isSubmitting}
-            className="px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg font-bold shadow-lg shadow-cyan-500/20 transform active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-10 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-white/5 hover:bg-cyan-400 transition-all duration-500 transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-             {isSubmitting ? 'Saving...' : 'Save Changes'}
+             {isSubmitting ? 'Syncing...' : 'Commit Changes'}
           </button>
         </div>
 

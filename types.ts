@@ -16,7 +16,17 @@ export interface Message {
 
 export enum GeminiModel {
   FLASH = 'gemini-2.5-flash',
-  PRO = 'gemini-3-pro-preview' // Used for complex tasks if needed
+  PRO = 'gemini-3-pro-preview',
+  NANO_PRO = 'gemini-3-pro-image-preview'
+}
+
+export interface GeneratedImage {
+  id: string;
+  userId: string;
+  prompt: string;
+  imageUrl: string;
+  timestamp: number;
+  model: string;
 }
 
 export interface ChatState {

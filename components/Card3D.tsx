@@ -114,113 +114,114 @@ const Card3D: React.FC<Card3DProps> = ({
       <div className={`relative w-full h-full duration-700 transition-all transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
         
         {/* FRONT FACE */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 shadow-2xl group-hover:shadow-cyan-500/20 transition-shadow">
+        <div className="absolute inset-0 w-full h-full backface-hidden rounded-[2rem] overflow-hidden bg-black border border-white/5 shadow-2xl transition-all duration-700 group-hover:border-white/20">
           
           {/* Skeleton Loader */}
           {!isImageLoaded && (
-            <div className="absolute inset-0 bg-slate-800/80 animate-pulse z-20 flex flex-col items-center justify-center border border-slate-700/50">
-               <div className="w-16 h-16 bg-slate-700/50 rounded-full flex items-center justify-center mb-4 text-slate-500">
-                  <Icon name="Image" className="w-8 h-8 opacity-50" />
-               </div>
-               <div className="h-4 bg-slate-700/50 rounded w-32 mb-2"></div>
-               <div className="h-3 bg-slate-700/50 rounded w-24"></div>
+            <div className="absolute inset-0 bg-black/80 animate-pulse z-20 flex flex-col items-center justify-center">
+               <div className="w-12 h-12 border-2 border-white/10 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
+               <div className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Loading Node...</div>
             </div>
           )}
 
           {/* Image */}
-          <div className="absolute inset-0 bg-slate-900">
+          <div className="absolute inset-0 bg-black">
              <img 
                ref={imgRef}
                src={imageUrl} 
                alt={title} 
                onLoad={() => setIsImageLoaded(true)}
-               className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-110 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`} 
+               className={`w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`} 
+               referrerPolicy="no-referrer"
              />
-             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent opacity-80"></div>
+             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90 transition-opacity duration-700 group-hover:opacity-70"></div>
           </div>
 
-          {/* Like Button (Top Right) */}
-          <button 
-            onClick={handleLikeClick}
-            className={`absolute top-4 right-4 z-30 p-2.5 rounded-full backdrop-blur-md transition-all duration-300 group/like hover:scale-110 ${
-              localIsLiked 
-                ? 'bg-red-500/20 text-red-500 border border-red-500/50' 
-                : 'bg-black/30 text-white/70 border border-white/10 hover:bg-black/50 hover:text-white'
-            } ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
-          >
-             <Icon 
-               name={localIsLiked ? "Heart" : "HeartOutline"} 
-               className={`w-5 h-5 transition-transform ${localIsLiked ? 'scale-110' : ''}`} 
-             />
-             <span className="sr-only">Like</span>
-          </button>
+          {/* Top Bar Info */}
+          <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-30">
+             <div className="flex items-center gap-3 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-xl border border-white/10">
+                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></div>
+                <span className="text-[10px] font-mono text-white/80 uppercase tracking-widest">{author}</span>
+             </div>
+             
+             <button 
+               onClick={handleLikeClick}
+               className={`p-3 rounded-2xl backdrop-blur-xl transition-all duration-500 hover:scale-110 ${
+                 localIsLiked 
+                   ? 'bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.5)]' 
+                   : 'bg-black/40 text-white/70 border border-white/10 hover:bg-white hover:text-black'
+               }`}
+             >
+                <Icon 
+                  name={localIsLiked ? "Heart" : "HeartOutline"} 
+                  className="w-4 h-4" 
+                />
+             </button>
+          </div>
           
-          {/* Like Count Badge */}
-          {localLikeCount > 0 && (
-             <div className={`absolute top-14 right-4 z-20 text-[10px] font-bold text-white bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}>
-                {localLikeCount}
-             </div>
-          )}
-
           {/* Front Content */}
-          <div className={`absolute bottom-0 left-0 w-full p-6 translate-y-2 group-hover:translate-y-0 transition-all duration-500 ${isImageLoaded ? 'opacity-100 delay-100' : 'opacity-0'}`}>
-             <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-cyan-500/50">
-                   {author.charAt(0).toUpperCase()}
+          <div className={`absolute bottom-8 left-8 right-8 transition-all duration-700 ${isImageLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+             <h3 className="text-3xl font-black text-white mb-2 tracking-tighter leading-none group-hover:text-cyan-400 transition-colors">{title}</h3>
+             <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                   <Icon name="Sparkles" className="w-3 h-3 text-cyan-500" />
+                   <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Neural Asset</span>
                 </div>
-                <span className="text-xs font-semibold text-cyan-300 tracking-wide uppercase drop-shadow-md">{author}</span>
+                <div className="w-1 h-1 rounded-full bg-white/20"></div>
+                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">{localLikeCount} Syncs</span>
              </div>
-             <h3 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">{title}</h3>
-             <p className="text-xs text-slate-300 line-clamp-1 opacity-80">Click to reveal prompt</p>
           </div>
 
+          {/* Hover Interaction Hint */}
+          <div className="absolute inset-0 bg-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
         </div>
 
         {/* BACK FACE */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-2xl overflow-hidden bg-[#0f172a] border border-cyan-500/30 shadow-2xl p-6 flex flex-col relative">
+        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-[2rem] overflow-hidden bg-[#0a0a0a] border border-white/10 shadow-2xl p-10 flex flex-col relative group/back">
           
-          {/* Decorative Grid Background */}
-          <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #22d3ee 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/10 to-purple-900/10 pointer-events-none"></div>
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl"></div>
 
           {/* Header */}
-          <div className="flex items-center justify-between mb-4 z-10 border-b border-white/10 pb-3">
-             <div className="flex items-center gap-2">
-                <Icon name="Image" className="w-4 h-4 text-cyan-400" />
-                <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Prompt Details</span>
+          <div className="flex items-center justify-between mb-10 z-10">
+             <div className="flex flex-col">
+                <span className="text-[10px] font-mono text-cyan-500 uppercase tracking-[0.3em] mb-1">Neural Parameters</span>
+                <h4 className="text-xl font-black text-white tracking-tighter uppercase">Source Code</h4>
              </div>
-             <button className="text-xs text-slate-500 hover:text-white transition-colors">
-                <Icon name="X" className="w-4 h-4" />
-             </button>
+             <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
+                <Icon name="Sliders" className="w-5 h-5 text-slate-400" />
+             </div>
           </div>
 
           {/* Prompt Content */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar z-10 space-y-4">
-             <div>
-                <label className="text-[10px] uppercase text-slate-500 font-bold mb-1 block">Full Prompt</label>
-                <div className="p-3 bg-black/50 rounded-lg border border-slate-700/50 text-sm text-cyan-100 font-mono leading-relaxed relative group/code">
-                   {prompt}
-                </div>
+          <div className="flex-1 overflow-y-auto scrollbar-hide z-10 space-y-8">
+             <div className="relative">
+                <div className="absolute -left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-cyan-500 to-transparent opacity-50"></div>
+                <p className="text-lg text-slate-300 font-medium leading-relaxed italic">
+                   "{prompt}"
+                </p>
              </div>
              
              {description && (
-                <div>
-                  <label className="text-[10px] uppercase text-slate-500 font-bold mb-1 block">Backstory</label>
-                  <p className="text-xs text-slate-400 italic">"{description}"</p>
+                <div className="pt-6 border-t border-white/5">
+                  <p className="text-xs text-slate-500 leading-relaxed font-mono uppercase tracking-wider">
+                     {description}
+                  </p>
                 </div>
              )}
           </div>
 
           {/* Actions */}
-          <div className="mt-4 pt-3 border-t border-white/10 z-10 flex gap-2">
+          <div className="mt-10 flex gap-4 z-10">
              <button 
                onClick={handleCopyPrompt}
-               className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg transition-colors border border-slate-700"
+               className="flex-1 py-4 bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-all duration-500"
              >
-                Copy Prompt
+                Clone Prompt
              </button>
-             <button className="flex-1 flex items-center justify-center gap-2 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-cyan-500/20 transition-all">
-                Try this
+             <button className="flex-1 py-4 bg-white text-black text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-cyan-400 transition-all duration-500 shadow-xl shadow-white/5">
+                Initialize
              </button>
           </div>
         </div>

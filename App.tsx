@@ -77,7 +77,23 @@ const App: React.FC = () => {
         if (currentUser?.role === 'admin') {
             return <AdminPanel currentUser={currentUser} />;
         }
-        return <div className="p-8 text-center text-red-400">Access Denied</div>;
+        return (
+          <div className="flex flex-col items-center justify-center h-full bg-[#050505] p-10">
+            <div className="bg-black border border-red-500/20 p-12 rounded-[3rem] backdrop-blur-3xl text-center max-w-md shadow-2xl shadow-red-500/5">
+                <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-red-500/10 mb-8 text-red-500 border border-red-500/20">
+                     <Icon name="Lock" className="w-12 h-12" />
+                </div>
+                <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Access Denied</h2>
+                <p className="text-slate-500 font-medium mb-10 leading-relaxed">Your current authorization level is insufficient to access the Command Center.</p>
+                <button 
+                    onClick={() => setActiveTab('explore')}
+                    className="px-10 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-500 transition-all duration-500"
+                >
+                    Return to Stream
+                </button>
+            </div>
+          </div>
+        );
       case 'account':
         if (currentUser) {
              return <Dashboard user={currentUser} />;
@@ -89,18 +105,18 @@ const App: React.FC = () => {
         return <ContactForm currentUser={currentUser} />;
       default:
         return (
-          <div className="flex flex-col items-center justify-center h-full text-slate-500">
-            <div className="bg-slate-800/50 p-8 rounded-3xl border border-slate-700/50 backdrop-blur-sm text-center max-w-md mx-4">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-700/50 mb-6 text-slate-400">
-                     <Icon name={getNavItems().find(n => n.id === activeTab)?.icon || 'Home'} className="w-10 h-10" />
+          <div className="flex flex-col items-center justify-center h-full bg-[#050505] p-10">
+            <div className="bg-black border border-white/10 p-12 rounded-[3rem] backdrop-blur-3xl text-center max-w-md shadow-2xl">
+                <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-white/5 mb-8 text-slate-400 border border-white/10">
+                     <Icon name={getNavItems().find(n => n.id === activeTab)?.icon || 'Home'} className="w-12 h-12" />
                 </div>
-                <h2 className="text-3xl font-bold text-slate-200 mb-2 capitalize">{activeTab}</h2>
-                <p className="mb-6">This module is currently under development.</p>
+                <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">{activeTab}</h2>
+                <p className="text-slate-500 font-medium mb-10 leading-relaxed">This neural module is currently undergoing synthesis and optimization.</p>
                 <button 
                     onClick={() => setActiveTab('explore')}
-                    className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                    className="px-10 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-cyan-400 transition-all duration-500"
                 >
-                    Return to Explore
+                    Return to Stream
                 </button>
             </div>
           </div>
@@ -109,7 +125,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen bg-slate-950 overflow-hidden font-sans">
+    <div className="flex h-screen w-screen bg-[#050505] overflow-hidden font-sans selection:bg-cyan-500/30">
       <Sidebar 
         items={getNavItems()} 
         activeId={activeTab} 
@@ -117,9 +133,11 @@ const App: React.FC = () => {
         user={currentUser}
       />
       
-      <main className="flex-1 ml-20 md:ml-64 relative bg-slate-900 h-full transition-all duration-300">
-         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-slate-900 via-slate-900/80 to-transparent z-10 pointer-events-none"></div>
-         {renderContent()}
+      <main className="flex-1 ml-20 md:ml-72 relative bg-[#050505] h-full transition-all duration-500 ease-in-out">
+         {/* Content Container */}
+         <div className="h-full relative z-10">
+            {renderContent()}
+         </div>
       </main>
     </div>
   );

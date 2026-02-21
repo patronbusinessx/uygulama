@@ -250,45 +250,50 @@ const ChatInterface: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 relative overflow-hidden">
+    <div className="flex flex-col h-full bg-[#050505] relative overflow-hidden scrollbar-hide">
       {/* Background Ambience */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] left-[20%] w-96 h-96 bg-purple-600/10 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-[-20%] right-[20%] w-96 h-96 bg-cyan-600/10 rounded-full blur-[100px]"></div>
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-purple-500/5 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-cyan-500/5 rounded-full blur-[120px]"></div>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 z-10 scroll-smooth">
+      <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-10 z-10 scroll-smooth scrollbar-hide">
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
           >
             <div
-              className={`max-w-[85%] md:max-w-[70%] rounded-2xl p-4 md:p-6 shadow-xl backdrop-blur-md border ${
+              className={`max-w-[85%] md:max-w-[70%] rounded-[2rem] p-6 md:p-8 shadow-2xl backdrop-blur-3xl border transition-all duration-500 ${
                 msg.role === 'user'
-                  ? 'bg-gradient-to-br from-cyan-600 to-blue-700 border-cyan-500/30 text-white rounded-br-none'
-                  : 'bg-slate-800/60 border-slate-700/50 text-slate-100 rounded-bl-none'
+                  ? 'bg-white text-black border-white/20 rounded-br-none'
+                  : 'bg-white/[0.03] border-white/5 text-slate-100 rounded-bl-none'
               }`}
             >
-              {/* Image Display (User Upload or Model Generation) */}
+              {/* Image Display */}
               {msg.image && (
-                <div className="mb-4 overflow-hidden rounded-lg border border-white/10 bg-black/20 relative group">
-                  <img src={msg.image} alt="Content" className="max-h-96 w-auto object-contain mx-auto" />
+                <div className="mb-6 overflow-hidden rounded-2xl border border-white/10 bg-black/40 relative group">
+                  <img src={msg.image} alt="Content" className="max-h-[500px] w-full object-contain mx-auto transition-transform duration-700 group-hover:scale-105" />
                   {msg.role === 'model' && !msg.isStreaming && (
-                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded text-[10px] text-cyan-400 font-medium uppercase tracking-wider backdrop-blur-md">
-                      AI Generated
+                    <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/80 rounded-full text-[10px] text-cyan-400 font-black uppercase tracking-widest backdrop-blur-xl border border-white/10">
+                      Neural Synthesis
                     </div>
                   )}
                 </div>
               )}
               
               {/* Text Content */}
-              <div className="prose prose-invert prose-sm md:prose-base leading-relaxed whitespace-pre-wrap">
+              <div className={`prose prose-invert prose-sm md:prose-base leading-relaxed whitespace-pre-wrap font-medium ${msg.role === 'user' ? 'text-black prose-headings:text-black' : 'text-slate-200'}`}>
                 {msg.text}
                 {msg.isStreaming && (
-                  <span className="inline-block w-2 h-4 ml-1 align-middle bg-cyan-400 animate-pulse"></span>
+                  <span className="inline-block w-1.5 h-4 ml-2 align-middle bg-cyan-400 animate-pulse"></span>
                 )}
+              </div>
+              
+              {/* Timestamp */}
+              <div className={`mt-4 text-[10px] font-mono uppercase tracking-widest opacity-40 ${msg.role === 'user' ? 'text-black' : 'text-slate-500'}`}>
+                {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
             </div>
           </div>
@@ -297,18 +302,17 @@ const ChatInterface: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 md:p-8 z-20">
+      <div className="p-6 md:p-12 z-20 relative">
         
-        {/* Suggested Prompts (Image Mode Only) */}
+        {/* Suggested Prompts */}
         {isImageMode && !inputValue && !showSettings && (
-          <div className="max-w-4xl mx-auto mb-3 overflow-x-auto whitespace-nowrap scrollbar-hide px-2 pb-2">
-             <div className="flex gap-2">
-                <span className="text-xs text-slate-500 font-bold uppercase tracking-wider self-center mr-2">Try:</span>
+          <div className="max-w-4xl mx-auto mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide px-2 pb-2">
+             <div className="flex gap-3">
                 {SUGGESTED_PROMPTS.map((prompt, index) => (
                    <button
                       key={index}
                       onClick={() => setInputValue(prompt)}
-                      className="px-3 py-1.5 bg-slate-800/80 hover:bg-cyan-500/10 border border-slate-700 hover:border-cyan-500/40 rounded-full text-xs text-slate-300 hover:text-cyan-300 transition-all backdrop-blur-md flex-shrink-0"
+                      className="px-6 py-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 hover:border-white/20 rounded-full text-[10px] font-mono text-slate-400 hover:text-white transition-all backdrop-blur-3xl uppercase tracking-widest flex-shrink-0"
                    >
                       {prompt}
                    </button>
@@ -319,40 +323,40 @@ const ChatInterface: React.FC = () => {
 
         {/* Advanced Settings Panel */}
         {isImageMode && showSettings && (
-             <div className="max-w-4xl mx-auto mb-4 bg-slate-800/90 backdrop-blur-xl border border-cyan-500/30 rounded-2xl p-4 shadow-xl animate-fade-in-up">
-                 <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/10">
-                     <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
-                         <Icon name="Sliders" className="w-4 h-4" />
-                         Generation Settings
-                     </h3>
-                     <div className="flex items-center gap-2">
+             <div className="max-w-4xl mx-auto mb-8 bg-black border border-cyan-500/30 rounded-[2rem] p-8 shadow-2xl animate-fade-in backdrop-blur-3xl">
+                 <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+                     <div className="flex flex-col">
+                        <span className="text-[10px] font-mono text-cyan-500 uppercase tracking-[0.3em] mb-1">Neural Parameters</span>
+                        <h3 className="text-xl font-black text-white tracking-tighter uppercase">Synthesis Configuration</h3>
+                     </div>
+                     <div className="flex items-center gap-4">
                         {isSettingsModified && (
                           <button 
                             onClick={resetSettings}
-                            className="text-[10px] text-red-400 hover:text-red-300 font-bold uppercase tracking-wider px-2 py-1 rounded hover:bg-red-500/10 transition-colors"
+                            className="text-[10px] text-red-400 hover:text-red-300 font-black uppercase tracking-widest px-4 py-2 rounded-xl hover:bg-red-500/10 transition-all"
                           >
                             Reset
                           </button>
                         )}
-                        <button onClick={() => setShowSettings(false)} className="text-slate-400 hover:text-white">
+                        <button onClick={() => setShowSettings(false)} className="p-3 bg-white/5 border border-white/10 rounded-xl text-slate-400 hover:text-white transition-all">
                             <Icon name="X" className="w-4 h-4" />
                         </button>
                      </div>
                  </div>
                  
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                      {/* Aspect Ratio */}
-                     <div>
-                         <label className="text-[10px] text-slate-400 font-bold uppercase mb-2 block">Aspect Ratio</label>
-                         <div className="flex gap-2 flex-wrap">
+                     <div className="space-y-4">
+                         <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Aspect Ratio</label>
+                         <div className="flex gap-3 flex-wrap">
                              {ASPECT_RATIOS.map(ratio => (
                                  <button
                                      key={ratio}
                                      onClick={() => setAspectRatio(ratio)}
-                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                                     className={`px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all duration-500 ${
                                          aspectRatio === ratio 
-                                         ? 'bg-cyan-500/20 border-cyan-500 text-cyan-400' 
-                                         : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:bg-slate-700'
+                                         ? 'bg-cyan-500 text-white border-cyan-500 shadow-lg shadow-cyan-500/20' 
+                                         : 'bg-white/[0.03] border-white/5 text-slate-500 hover:text-white hover:border-white/20'
                                      }`}
                                  >
                                      {ratio}
@@ -362,102 +366,104 @@ const ChatInterface: React.FC = () => {
                      </div>
 
                      {/* Style Preset */}
-                     <div>
-                         <label className="text-[10px] text-slate-400 font-bold uppercase mb-2 block">Style Preset</label>
+                     <div className="space-y-4">
+                         <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Style Preset</label>
                          <div className="relative">
                              <select
                                  value={stylePreset}
                                  onChange={(e) => setStylePreset(e.target.value)}
-                                 className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"
+                                 className="w-full bg-white/[0.03] border border-white/5 rounded-xl px-6 py-4 text-[10px] font-black uppercase tracking-widest text-white focus:outline-none focus:border-cyan-500 transition-all appearance-none cursor-pointer"
                              >
                                  {STYLE_PRESETS.map(style => (
-                                     <option key={style} value={style}>{style}</option>
+                                     <option key={style} value={style} className="bg-black text-white">{style}</option>
                                  ))}
                              </select>
+                             <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
+                                <Icon name="ChevronDown" className="w-4 h-4" />
+                             </div>
                          </div>
                      </div>
                      
                      {/* Negative Prompt */}
-                     <div className="md:col-span-2">
-                         <label className="text-[10px] text-slate-400 font-bold uppercase mb-2 block">Negative Prompt (Exclude)</label>
+                     <div className="md:col-span-2 space-y-4">
+                         <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Negative Directives</label>
                          <input
                              type="text"
                              value={negativePrompt}
                              onChange={(e) => setNegativePrompt(e.target.value)}
                              placeholder="e.g. blurry, low quality, distorted"
-                             className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500 placeholder-slate-600"
+                             className="w-full bg-white/[0.03] border border-white/5 rounded-xl px-6 py-4 text-sm text-white focus:outline-none focus:border-cyan-500 placeholder-slate-700 transition-all"
                          />
                      </div>
                  </div>
              </div>
         )}
 
-        <div className={`max-w-4xl mx-auto relative bg-slate-800/80 backdrop-blur-xl border rounded-2xl shadow-2xl p-2 flex flex-col gap-2 transition-all focus-within:ring-1 focus-within:ring-cyan-500/20 ${isImageMode ? 'border-cyan-500/50 shadow-[0_0_30px_rgba(6,182,212,0.15)]' : 'border-slate-700'}`}>
+        <div className={`max-w-5xl mx-auto relative bg-black border rounded-[2.5rem] shadow-2xl p-3 flex flex-col gap-2 transition-all duration-700 ${isImageMode ? 'border-cyan-500/30 shadow-[0_0_40px_rgba(6,182,212,0.1)]' : 'border-white/10'}`}>
           
-          {/* Selected Image Preview in Input (for uploads) */}
+          {/* Selected Image Preview */}
           {selectedImage && !isImageMode && (
-            <div className="relative inline-block w-24 h-24 m-2 rounded-lg overflow-hidden border border-slate-600 group">
+            <div className="relative inline-block w-32 h-32 m-4 rounded-2xl overflow-hidden border border-white/10 group animate-fade-in">
               <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
-              <button
-                onClick={() => setSelectedImage(null)}
-                className="absolute top-1 right-1 bg-black/60 p-1 rounded-full text-white hover:bg-red-500 transition-colors"
-              >
-                <Icon name="X" className="w-3 h-3" />
-              </button>
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                <button
+                  onClick={() => setSelectedImage(null)}
+                  className="bg-white p-2 rounded-xl text-black hover:bg-red-500 hover:text-white transition-all"
+                >
+                  <Icon name="X" className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           )}
 
           {/* Mode Indicator */}
           {isImageMode && (
-             <div className="px-3 py-1.5 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 text-xs font-bold uppercase tracking-wider rounded-t-lg mx-1 mt-1 flex items-center justify-between border-b border-cyan-500/20">
-                <div className="flex items-center gap-2">
-                    <Icon name="Sparkles" className="w-3 h-3" />
-                    Image Generation Mode
+             <div className="px-6 py-3 bg-cyan-500/10 text-cyan-400 text-[10px] font-black uppercase tracking-[0.2em] rounded-t-[1.5rem] mx-2 mt-2 flex items-center justify-between border-b border-cyan-500/10">
+                <div className="flex items-center gap-3">
+                    <Icon name="Sparkles" className="w-3 h-3 animate-pulse" />
+                    Neural Synthesis Mode
                 </div>
-                {/* Current Settings Summary */}
-                <div className="text-[10px] text-cyan-300/70 font-mono hidden md:block">
+                <div className="text-[10px] font-mono text-cyan-300/50 hidden md:block">
                     {aspectRatio} • {stylePreset}
                 </div>
              </div>
           )}
 
-          <div className="flex items-end gap-2 p-1">
+          <div className="flex items-end gap-4 p-2">
              {/* Image Gen Toggle */}
              <button
               onClick={toggleImageMode}
-              className={`p-3 rounded-xl transition-all duration-300 relative group ${
+              className={`p-4 rounded-2xl transition-all duration-500 relative group ${
                 isImageMode 
-                ? 'text-cyan-400 bg-cyan-500/10' 
-                : 'text-slate-400 hover:text-cyan-400 hover:bg-slate-700/50'
+                ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20' 
+                : 'text-slate-500 hover:text-white hover:bg-white/5'
               }`}
-              title={isImageMode ? "Switch to Regular Chat" : "Switch to Image Generation"}
             >
-              <Icon name="Sparkles" className={`w-6 h-6 transition-transform duration-300 ${isImageMode ? 'scale-110 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]' : ''}`} />
+              <Icon name="Sparkles" className={`w-6 h-6 transition-transform duration-500 ${isImageMode ? 'scale-110' : ''}`} />
             </button>
             
-            {/* Settings Toggle (Only in Image Mode) */}
+            {/* Settings Toggle */}
             {isImageMode && (
                 <div className="relative">
                   <button
                       onClick={() => setShowSettings(!showSettings)}
-                      className={`p-3 rounded-xl transition-all duration-300 ${
+                      className={`p-4 rounded-2xl transition-all duration-500 ${
                           showSettings 
-                          ? 'text-cyan-400 bg-cyan-500/10' 
+                          ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20' 
                           : isSettingsModified 
-                            ? 'text-cyan-400 bg-slate-800 hover:bg-slate-700'
-                            : 'text-slate-400 hover:text-cyan-400 hover:bg-slate-700/50'
+                            ? 'text-cyan-400 bg-white/5 border border-cyan-500/20'
+                            : 'text-slate-500 hover:text-white hover:bg-white/5'
                       }`}
-                      title="Advanced Settings"
                   >
                       <Icon name="Sliders" className="w-6 h-6" />
                   </button>
                   {isSettingsModified && !showSettings && (
-                      <span className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_rgba(34,211,238,0.8)] border border-slate-900"></span>
+                      <span className="absolute top-3 right-3 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.8)]"></span>
                   )}
                 </div>
             )}
 
-             {/* File Upload Button (Disabled in Image Mode) */}
+             {/* File Upload Button */}
             <input
               type="file"
               ref={fileInputRef}
@@ -469,55 +475,49 @@ const ChatInterface: React.FC = () => {
             {!isImageMode && (
                 <button
                 onClick={() => fileInputRef.current?.click()}
-                className={`p-3 rounded-xl transition-all text-slate-400 hover:text-cyan-400 hover:bg-slate-700/50`}
-                title="Upload Image"
+                className="p-4 rounded-2xl transition-all text-slate-500 hover:text-white hover:bg-white/5"
                 >
                 <Icon name="Image" className="w-6 h-6" />
                 </button>
             )}
 
             {/* Text Input */}
-            <div className="flex-1 relative">
+            <div className="flex-1 relative pb-2">
                 <textarea
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={isImageMode ? "Describe the image you want to create..." : "Ask anything or upload a photo to analyze..."}
-                  className="w-full bg-transparent text-slate-200 placeholder-slate-500 focus:outline-none resize-none py-3 pr-10 max-h-32 min-h-[50px] scrollbar-hide"
+                  placeholder={isImageMode ? "Describe the asset to synthesize..." : "Ask anything or upload a photo..."}
+                  className="w-full bg-transparent text-white placeholder-slate-700 focus:outline-none resize-none py-4 pr-12 max-h-48 min-h-[60px] scrollbar-hide font-medium"
                   rows={1}
-                  style={{ height: 'auto', minHeight: '24px' }}
                 />
                  {/* Clear Text Button */}
                 {inputValue && (
                   <button 
                     onClick={() => setInputValue('')}
-                    className="absolute right-0 top-3 text-slate-500 hover:text-white transition-colors p-1"
+                    className="absolute right-0 top-4 text-slate-700 hover:text-white transition-colors p-2"
                   >
                      <Icon name="X" className="w-4 h-4" />
                   </button>
                 )}
-                 {/* Character Counter */}
-                <div className="absolute right-0 -bottom-5 text-[10px] text-slate-600 font-mono">
-                    {inputValue.length} chars
-                </div>
             </div>
 
             {/* Send Button */}
             <button
               onClick={handleSendMessage}
               disabled={isLoading || (!inputValue.trim() && !selectedImage)}
-              className={`p-3 rounded-xl transition-all duration-300 ${
+              className={`p-5 rounded-2xl transition-all duration-700 ${
                 isLoading || (!inputValue.trim() && !selectedImage)
-                  ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transform hover:-translate-y-0.5'
+                  ? 'bg-white/5 text-slate-700 cursor-not-allowed'
+                  : 'bg-white text-black shadow-2xl shadow-white/5 hover:bg-cyan-400 transform hover:-translate-y-1'
               }`}
             >
               <Icon name="Send" className="w-6 h-6" />
             </button>
           </div>
         </div>
-        <div className="text-center mt-3">
-            <p className="text-[10px] text-slate-600 uppercase tracking-widest opacity-60">Powered by Gemini 2.5 & 3 Pro</p>
+        <div className="text-center mt-6">
+            <p className="text-[10px] font-mono text-slate-700 uppercase tracking-[0.4em]">Neural Processing Unit • Gemini 3.1 Pro</p>
         </div>
       </div>
     </div>

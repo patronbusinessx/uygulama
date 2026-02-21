@@ -47,89 +47,99 @@ const ContactForm: React.FC<ContactFormProps> = ({ currentUser }) => {
   };
 
   return (
-    <div className="h-full w-full flex items-center justify-center p-6 bg-slate-900 relative overflow-hidden">
+    <div className="h-full w-full flex items-center justify-center p-10 bg-[#050505] relative overflow-hidden scrollbar-hide">
       {/* Background Ambience */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[10%] left-[20%] w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-cyan-600/5 rounded-full blur-[100px]"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-cyan-500/5 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-purple-500/5 rounded-full blur-[120px]"></div>
       </div>
 
-      <div className="w-full max-w-lg relative z-10">
+      <div className="w-full max-w-2xl relative z-10 animate-fade-in">
         
         {/* Header Text */}
-        <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Get in Touch</h1>
-            <p className="text-slate-400">We'd love to hear from you. Send us a message.</p>
+        <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-6">
+               <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></div>
+               <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest">Neural Support Active</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase leading-none mb-6">
+               Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/40">Touch</span>
+            </h1>
+            <p className="text-slate-400 text-lg font-medium max-w-md mx-auto leading-relaxed">
+               Have a question or feedback? Our neural network is ready to process your transmission.
+            </p>
         </div>
 
-        {/* Card */}
-        <div className="bg-slate-800/50 backdrop-blur-md border border-slate-700/50 rounded-3xl p-8 shadow-2xl">
+        {/* Card - Next Gen Minimalist */}
+        <div className="bg-black border border-white/10 rounded-[2.5rem] p-10 md:p-14 shadow-2xl backdrop-blur-3xl relative group">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
           
           {isSuccess ? (
-            <div className="py-12 flex flex-col items-center justify-center text-center animate-fade-in-up">
-              <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mb-4 text-emerald-400 border border-emerald-500/20">
-                 <Icon name="Check" className="w-8 h-8" />
+            <div className="py-12 flex flex-col items-center justify-center text-center animate-fade-in">
+              <div className="w-20 h-20 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-8 text-emerald-400 border border-emerald-500/20">
+                 <Icon name="Check" className="w-10 h-10" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Message Sent!</h3>
-              <p className="text-slate-400 max-w-xs">Thank you for reaching out. We will get back to you shortly.</p>
+              <h3 className="text-3xl font-black text-white tracking-tighter uppercase mb-4">Transmission Received</h3>
+              <p className="text-slate-400 max-w-xs mx-auto text-sm leading-relaxed">
+                 Your message has been successfully synced with our core. We will respond shortly.
+              </p>
               <button 
                 onClick={() => setIsSuccess(false)}
-                className="mt-6 text-sm text-cyan-400 hover:text-cyan-300 font-medium"
+                className="mt-10 px-8 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-cyan-400 transition-all duration-500"
               >
-                Send another message
+                New Transmission
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
               
-              {/* Name Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-300">Your Name</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    disabled={!!currentUser} // Read only if logged in
-                    placeholder="John Doe"
-                    className={`w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder-slate-600 ${currentUser ? 'opacity-70 cursor-not-allowed' : ''}`}
-                    required
-                  />
-                  <div className="absolute right-3 top-3.5 text-slate-500">
-                    <Icon name="Person" className="w-5 h-5" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                {/* Name Field */}
+                <div className="space-y-4">
+                  <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Identity</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      disabled={!!currentUser}
+                      placeholder="John Doe"
+                      className={`w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all ${currentUser ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      required
+                    />
                   </div>
                 </div>
-              </div>
 
-              {/* Subject Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-300">Subject</label>
-                <div className="relative">
-                  <select
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all appearance-none cursor-pointer"
-                  >
-                    <option value="General Inquiry">General Inquiry</option>
-                    <option value="Collaboration">Collaboration</option>
-                    <option value="Technical Support">Technical Support</option>
-                    <option value="Feedback">Feedback</option>
-                  </select>
-                  <div className="absolute right-4 top-4 text-slate-500 pointer-events-none">
-                    <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                {/* Subject Field */}
+                <div className="space-y-4">
+                  <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Directive</label>
+                  <div className="relative">
+                    <select
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="General Inquiry">General Inquiry</option>
+                      <option value="Collaboration">Collaboration</option>
+                      <option value="Technical Support">Technical Support</option>
+                      <option value="Feedback">Feedback</option>
+                    </select>
+                    <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
+                      <Icon name="ChevronDown" className="w-4 h-4" />
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Message Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-300">Message</label>
+              <div className="space-y-4">
+                <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Neural Data</label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="How can we help you today?"
-                  rows={4}
-                  className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder-slate-600 resize-none"
+                  rows={5}
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all resize-none font-medium"
                   required
                 ></textarea>
               </div>
@@ -138,17 +148,17 @@ const ContactForm: React.FC<ContactFormProps> = ({ currentUser }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 rounded-xl font-bold tracking-wide shadow-lg shadow-cyan-500/20 bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-500 hover:to-blue-500 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+                className="w-full py-5 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] transition-all duration-700 shadow-2xl bg-white text-black hover:bg-cyan-400 shadow-white/5 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
               >
                 {isSubmitting ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                    Sending...
+                    <div className="w-4 h-4 border-2 border-slate-600 border-t-black rounded-full animate-spin"></div>
+                    Processing...
                   </>
                 ) : (
                   <>
                     <Icon name="Send" className="w-4 h-4" />
-                    Send Message
+                    Sync Transmission
                   </>
                 )}
               </button>

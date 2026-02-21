@@ -122,179 +122,136 @@ const LoginInterface: React.FC<LoginInterfaceProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="h-full w-full overflow-y-auto relative z-20 custom-scrollbar">
+    <div className="h-full w-full overflow-y-auto relative z-20 scrollbar-hide">
       {/* Background Ambience tailored for Login */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-[10%] right-[10%] md:top-[20%] md:right-[30%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-purple-600/5 rounded-full blur-[80px] md:blur-[120px]"></div>
-          <div className="absolute bottom-[10%] left-[10%] md:bottom-[10%] md:left-[20%] w-[250px] h-[250px] md:w-[400px] md:h-[400px] bg-cyan-600/5 rounded-full blur-[60px] md:blur-[100px]"></div>
+          <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] bg-cyan-500/5 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[60%] bg-purple-500/5 rounded-full blur-[120px]"></div>
       </div>
 
-      <div className="flex items-center justify-center min-h-full py-10 px-4 md:px-6">
-        {/* Login/Signup Card */}
-        <div className="w-full max-w-[360px] md:max-w-[400px] mx-auto p-6 md:p-10 rounded-2xl md:rounded-3xl bg-[#0f172a]/95 border border-slate-800 shadow-2xl relative z-10 backdrop-blur-xl transition-all duration-500">
-          
-          {/* Back Button for Forgot Password */}
-          {isForgot && (
-              <button 
-                  onClick={() => setAuthMode('login')}
-                  className="absolute top-6 left-6 text-slate-500 hover:text-white transition-colors"
-              >
-                  <Icon name="ArrowLeft" className="w-5 h-5" />
-              </button>
-          )}
+      <div className="flex items-center justify-center min-h-full py-20 px-6">
+        {/* Login/Signup Card - Next Gen Minimalist */}
+        <div className="w-full max-w-[440px] mx-auto relative group">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-[2.5rem] blur-xl opacity-50 group-hover:opacity-75 transition duration-1000"></div>
+          <div className="relative bg-black border border-white/5 rounded-[2.5rem] p-10 md:p-14 overflow-hidden backdrop-blur-3xl">
+            
+            {/* Back Button for Forgot Password */}
+            {isForgot && (
+                <button 
+                    onClick={() => setAuthMode('login')}
+                    className="absolute top-8 left-8 p-3 rounded-2xl bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all"
+                >
+                    <Icon name="ArrowLeft" className="w-4 h-4" />
+                </button>
+            )}
 
-          {/* Avatar Header */}
-          <div className="flex justify-center mb-6 relative">
-            <div className={`w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#1e293b] flex items-center justify-center border-4 border-[#0f172a] shadow-lg shadow-black/40 z-10 transition-transform hover:scale-105 ${isForgot ? 'ring-2 ring-red-500/20' : ''}`}>
-               <Icon 
-                  name={isLogin ? "Account" : isSignup ? "Person" : "Lock"} 
-                  className={`w-10 h-10 md:w-12 md:h-12 ${isLogin ? 'text-slate-400' : isSignup ? 'text-cyan-400' : 'text-red-400'}`} 
-               />
-            </div>
-            {/* Decorative glow behind avatar */}
-            <div className={`absolute top-4 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full blur-xl transition-colors duration-500 ${isLogin ? 'bg-cyan-500/20' : isSignup ? 'bg-purple-500/20' : 'bg-red-500/20'}`}></div>
-          </div>
-
-          {/* Title */}
-          <h2 className="text-2xl md:text-3xl font-bold text-center text-white tracking-widest mb-3 transition-all">
-              {getTitle()}
-          </h2>
-          
-          {/* Status Message (Dynamic) */}
-          <div className="h-10 md:h-8 mb-4 md:mb-6 text-center flex items-center justify-center">
-              <p className={`text-xs font-semibold transition-all duration-300 ${
+            {/* Header Section */}
+            <div className="text-center mb-12">
+               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 border border-white/10 mb-8 group-hover:scale-110 transition-transform duration-700">
+                  <Icon 
+                    name={isLogin ? "Account" : isSignup ? "Person" : "Lock"} 
+                    className={`w-8 h-8 ${isLogin ? 'text-white' : isSignup ? 'text-cyan-400' : 'text-red-400'}`} 
+                  />
+               </div>
+               <h2 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">
+                  {getTitle()}
+               </h2>
+               <p className={`text-xs font-mono uppercase tracking-[0.3em] transition-all duration-500 ${
                   statusType === 'success' ? 'text-emerald-400' : 
                   statusType === 'error' ? 'text-rose-500' : 
-                  'text-slate-500' // Default neutral
-              }`}>
-              {statusMessage || (isLogin ? 'Please enter your credentials' : isSignup ? 'Create your account' : 'Enter email to reset password')}
-              </p>
-          </div>
-
-          {/* Form Inputs */}
-          <div className="space-y-4 md:space-y-5">
-            
-            {/* Username Field (Login/Signup only) */}
-            <div className={`relative group transition-all duration-300 ${isForgot ? 'hidden' : 'block'}`}>
-              <input 
-                type="text" 
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-[#1e293b] rounded-lg text-slate-200 px-4 py-3 pr-10 text-sm md:text-base focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder-transparent peer border border-transparent focus:border-cyan-500/30"
-                placeholder="Username"
-                id="username"
-              />
-              <label 
-                  htmlFor="username" 
-                  className={`absolute left-4 transition-all duration-300 pointer-events-none ${
-                      username 
-                      ? '-top-2.5 bg-[#0f172a] px-1 text-xs text-cyan-500' 
-                      : 'top-3.5 text-slate-500 text-sm peer-focus:-top-2.5 peer-focus:bg-[#0f172a] peer-focus:px-1 peer-focus:text-xs peer-focus:text-cyan-500'
-                  }`}
-              >
-                Username
-              </label>
-              <Icon name="Person" className={`absolute right-3 top-3.5 w-5 h-5 transition-colors duration-300 ${username ? 'text-cyan-500' : 'text-slate-600'}`} />
+                  'text-slate-500'
+               }`}>
+                  {statusMessage || (isLogin ? 'Neural Access' : isSignup ? 'Identity Creation' : 'Recovery Protocol')}
+               </p>
             </div>
 
-            {/* Email Field (Sign Up and Forgot Password) */}
-            <div className={`relative group transition-all duration-500 overflow-hidden ${isLogin ? 'max-h-0 opacity-0 mb-0' : 'max-h-24 opacity-100'}`}>
-              <input 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#1e293b] rounded-lg text-slate-200 px-4 py-3 pr-10 text-sm md:text-base focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder-transparent peer border border-transparent focus:border-cyan-500/30"
-                placeholder="Email"
-                id="email"
-              />
-              <label 
-                  htmlFor="email" 
-                  className={`absolute left-4 transition-all duration-300 pointer-events-none ${
-                      email 
-                      ? '-top-2.5 bg-[#0f172a] px-1 text-xs text-cyan-500' 
-                      : 'top-3.5 text-slate-500 text-sm peer-focus:-top-2.5 peer-focus:bg-[#0f172a] peer-focus:px-1 peer-focus:text-xs peer-focus:text-cyan-500'
-                  }`}
-              >
-                Email
-              </label>
-              <Icon name="Contact" className={`absolute right-3 top-3.5 w-5 h-5 transition-colors duration-300 ${email ? 'text-cyan-500' : 'text-slate-600'}`} />
-            </div>
+            {/* Form Inputs */}
+            <div className="space-y-6">
+              
+              {/* Username Field */}
+              <div className={`space-y-2 transition-all duration-500 ${isForgot ? 'hidden' : 'block'}`}>
+                <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Identity</label>
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all"
+                    placeholder="Username"
+                  />
+                </div>
+              </div>
 
-            {/* Password Field (Login/Signup only) */}
-            <div className={`relative group transition-all duration-300 ${isForgot ? 'hidden' : 'block'}`}>
-              <input 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#1e293b] rounded-lg text-slate-200 px-4 py-3 pr-10 text-sm md:text-base focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder-transparent peer border border-transparent focus:border-cyan-500/30"
-                placeholder="Password"
-                id="password"
-              />
-              <label 
-                  htmlFor="password" 
-                  className={`absolute left-4 transition-all duration-300 pointer-events-none ${
-                      password 
-                      ? '-top-2.5 bg-[#0f172a] px-1 text-xs text-cyan-500' 
-                      : 'top-3.5 text-slate-500 text-sm peer-focus:-top-2.5 peer-focus:bg-[#0f172a] peer-focus:px-1 peer-focus:text-xs peer-focus:text-cyan-500'
-                  }`}
-              >
-                Password
-              </label>
-              <Icon name="Lock" className={`absolute right-3 top-3.5 w-5 h-5 transition-colors duration-300 ${password ? 'text-cyan-500' : 'text-slate-600'}`} />
-            </div>
+              {/* Email Field */}
+              <div className={`space-y-2 transition-all duration-500 ${isLogin ? 'hidden' : 'block'}`}>
+                <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Communication</label>
+                <div className="relative">
+                  <input 
+                    type="email" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all"
+                    placeholder="Email Address"
+                  />
+                </div>
+              </div>
 
-            {/* Options Row (Login Only) */}
-            <div className={`flex items-center justify-between text-xs text-slate-400 mt-2 px-1 transition-all duration-300 ${!isLogin ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 h-auto'}`}>
-              <label className="flex items-center cursor-pointer hover:text-slate-300 transition-colors">
-                <input type="checkbox" className="mr-2 w-3 h-3 rounded bg-[#1e293b] border-slate-600 text-cyan-500 focus:ring-0 focus:ring-offset-0" />
-                Remember me
-              </label>
-              <button 
-                  onClick={() => setAuthMode('forgot')}
-                  className="hover:text-cyan-400 transition-colors"
-              >
-                  Forget Password?
-              </button>
-            </div>
+              {/* Password Field */}
+              <div className={`space-y-2 transition-all duration-500 ${isForgot ? 'hidden' : 'block'}`}>
+                <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Security Key</label>
+                <div className="relative">
+                  <input 
+                    type="password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
 
-            {/* Action Button */}
-            <button 
-              onClick={handleSubmit}
-              className={`w-full py-3 md:py-3.5 rounded-xl font-bold tracking-wide shadow-lg transition-all duration-300 mt-6 md:mt-8 text-sm md:text-base ${
-                isFormValid 
-                  ? 'bg-gradient-to-r from-[#00b4d8] to-[#0077b6] text-white shadow-cyan-500/30 hover:shadow-cyan-500/50 transform hover:-translate-y-0.5' 
-                  : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
-              }`}
-              disabled={!isFormValid}
-            >
-              {isLogin ? 'Login' : isSignup ? 'Sign Up' : 'Send Reset Link'}
-            </button>
-
-            {/* Toggle Mode */}
-            {!isForgot && (
-                <div className="text-center mt-6 md:mt-8 text-xs text-slate-500">
-                  {isLogin ? "Don't have an Account?" : "Already have an Account?"} 
+              {/* Options Row (Login Only) */}
+              {isLogin && (
+                <div className="flex items-center justify-between px-1">
+                  <label className="flex items-center gap-2 cursor-pointer group/check">
+                    <div className="w-4 h-4 rounded border border-white/10 bg-white/5 flex items-center justify-center group-hover:border-cyan-500 transition-colors">
+                       <div className="w-2 h-2 rounded-sm bg-cyan-500 opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Persistent Session</span>
+                  </label>
                   <button 
-                      onClick={() => setAuthMode(isLogin ? 'signup' : 'login')}
-                      className="text-slate-300 hover:text-cyan-400 font-medium ml-1 transition-colors outline-none"
+                      onClick={() => setAuthMode('forgot')}
+                      className="text-[10px] font-mono text-slate-500 hover:text-cyan-400 uppercase tracking-wider transition-colors"
                   >
-                      {isLogin ? 'Sign up' : 'Login'}
+                      Lost Key?
                   </button>
                 </div>
-            )}
-            
-            {isForgot && (
-                 <div className="text-center mt-6 md:mt-8 text-xs text-slate-500">
-                     Remembered your password?
-                     <button 
-                          onClick={() => setAuthMode('login')}
-                          className="text-slate-300 hover:text-cyan-400 font-medium ml-1 transition-colors outline-none"
-                      >
-                          Log In
-                      </button>
-                 </div>
-            )}
+              )}
 
+              {/* Action Button */}
+              <button 
+                onClick={handleSubmit}
+                disabled={!isFormValid}
+                className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all duration-500 shadow-2xl ${
+                  isFormValid 
+                    ? 'bg-white text-black hover:bg-cyan-400 shadow-white/5 transform hover:-translate-y-1' 
+                    : 'bg-white/5 text-slate-600 cursor-not-allowed border border-white/5'
+                }`}
+              >
+                {isLogin ? 'Authorize' : isSignup ? 'Initialize' : 'Recover'}
+              </button>
+
+              {/* Toggle Mode */}
+              <div className="text-center pt-6">
+                <button 
+                    onClick={() => setAuthMode(isForgot ? 'login' : isLogin ? 'signup' : 'login')}
+                    className="text-[10px] font-mono text-slate-500 hover:text-white uppercase tracking-[0.3em] transition-all"
+                >
+                    {isForgot ? 'Return to Access' : isLogin ? 'Create New Identity' : 'Existing Identity'}
+                </button>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>

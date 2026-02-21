@@ -75,51 +75,52 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/80 backdrop-blur-xl transition-opacity"
         onClick={onClose}
       ></div>
 
       {/* Modal Content */}
-      <div className="relative w-full max-w-2xl bg-[#0f172a] border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-3xl bg-black border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-fade-in">
         
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
-          <div className="flex items-center gap-3">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Icon name="Plus" className="w-5 h-5 text-cyan-400" />
-                Create New Post
+        <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
+          <div className="flex flex-col">
+              <span className="text-[10px] font-mono text-cyan-500 uppercase tracking-[0.3em] mb-1">Neural Network</span>
+              <h2 className="text-3xl font-black text-white tracking-tighter uppercase flex items-center gap-3">
+                Initialize Asset
+                {isPro && <span className="text-[10px] font-black bg-yellow-500 text-black px-2 py-0.5 rounded-full uppercase tracking-tighter">PRO</span>}
               </h2>
-              {isPro && <span className="text-[10px] font-bold bg-yellow-500 text-black px-2 py-0.5 rounded uppercase">Pro Unlocked</span>}
           </div>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+            className="p-3 bg-white/5 border border-white/10 rounded-2xl text-slate-400 hover:text-white transition-all"
           >
             <Icon name="X" className="w-5 h-5" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto space-y-6 custom-scrollbar">
+        <div className="p-10 overflow-y-auto space-y-10 scrollbar-hide">
           
           {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg">
+            <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono uppercase tracking-wider rounded-2xl flex items-center gap-3">
+              <Icon name="Alert" className="w-4 h-4" />
               {error}
             </div>
           )}
 
           {/* Image Upload Area */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-300">Artwork Image</label>
+          <div className="space-y-4">
+            <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Visual Data</label>
             <div 
               onClick={() => fileInputRef.current?.click()}
-              className={`relative h-64 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden group ${
+              className={`relative h-80 border border-dashed rounded-[2rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-700 overflow-hidden group ${
                 selectedImage 
-                ? 'border-cyan-500/50 bg-slate-900' 
-                : 'border-slate-700 bg-slate-800/30 hover:bg-slate-800/50 hover:border-slate-600'
+                ? 'border-cyan-500/30 bg-black' 
+                : 'border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20'
               }`}
             >
               <input 
@@ -132,59 +133,59 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
               
               {selectedImage ? (
                 <>
-                  <img src={selectedImage} alt="Preview" className="w-full h-full object-contain" />
-                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <p className="text-white font-medium flex items-center gap-2">
-                      <Icon name="UploadCloud" className="w-5 h-5" />
-                      Change Image
-                    </p>
+                  <img src={selectedImage} alt="Preview" className="w-full h-full object-contain p-4" />
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                    <div className="px-6 py-3 bg-white text-black rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-3">
+                      <Icon name="UploadCloud" className="w-4 h-4" />
+                      Re-Initialize
+                    </div>
                   </div>
                 </>
               ) : (
-                <div className="text-center p-6">
-                  <div className="w-12 h-12 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-400">
+                <div className="text-center p-10">
+                  <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-400 group-hover:scale-110 transition-transform duration-500">
                     <Icon name="UploadCloud" className="w-6 h-6" />
                   </div>
-                  <p className="text-slate-300 font-medium">Click to upload image</p>
-                  <p className="text-slate-500 text-sm mt-1">PNG, JPG up to 5MB</p>
+                  <p className="text-white font-black text-sm uppercase tracking-widest">Upload Asset</p>
+                  <p className="text-slate-500 text-[10px] font-mono mt-2 uppercase tracking-widest">MAX 5MB • PNG/JPG</p>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-10">
             
-            {/* Prompt Input (Moved up as it's more important now) */}
-            <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-300">Prompt Used</label>
+            {/* Prompt Input */}
+            <div className="space-y-4">
+                <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Neural Prompt</label>
                 <textarea 
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Describe the prompt you used to generate this image..."
+                placeholder="Describe the source prompt..."
                 rows={4}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all placeholder-slate-600 resize-none"
+                className="w-full bg-white/[0.02] border border-white/10 rounded-[1.5rem] px-6 py-5 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all resize-none font-medium"
                 />
             </div>
 
             {/* Description Input */}
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                  <label className="block text-sm font-medium text-slate-300">Description (Optional)</label>
-                  <span className={`text-xs ${description.length >= MAX_DESC_LENGTH ? 'text-red-400' : 'text-slate-500'}`}>
+            <div className="space-y-4">
+              <div className="flex justify-between items-end">
+                  <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Asset Backstory</label>
+                  <span className={`text-[10px] font-mono ${description.length >= MAX_DESC_LENGTH ? 'text-red-400' : 'text-slate-600'}`}>
                       {description.length} / {isPro ? '∞' : MAX_DESC_LENGTH}
                   </span>
               </div>
               <textarea 
                 value={description}
                 onChange={handleDescriptionChange}
-                placeholder="Share the story behind your creation..."
-                rows={2}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all placeholder-slate-600 resize-none"
+                placeholder="The narrative behind this creation..."
+                rows={3}
+                className="w-full bg-white/[0.02] border border-white/10 rounded-[1.5rem] px-6 py-5 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all resize-none font-medium"
               />
               {!isPro && (
-                  <p className="text-[10px] text-yellow-500/80 flex items-center gap-1">
+                  <p className="text-[10px] font-mono text-yellow-500/50 flex items-center gap-2 uppercase tracking-wider">
                       <Icon name="Lock" className="w-3 h-3" />
-                      Free users are limited to 100 characters. Upgrade to PRO for unlimited descriptions.
+                      PRO Membership required for extended narratives
                   </p>
               )}
             </div>
@@ -193,18 +194,18 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-slate-800 flex justify-end gap-3 bg-slate-900/50">
+        <div className="px-10 py-8 border-t border-white/5 flex justify-end gap-4">
           <button 
             onClick={onClose}
-            className="px-4 py-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium"
+            className="px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-colors"
           >
-            Cancel
+            Abort
           </button>
           <button 
             onClick={handleSubmit}
-            className="px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg font-bold shadow-lg shadow-cyan-500/20 transform active:scale-95 transition-all"
+            className="px-10 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-white/5 hover:bg-cyan-400 transition-all duration-500 transform active:scale-95"
           >
-            Publish Post
+            Finalize & Sync
           </button>
         </div>
 

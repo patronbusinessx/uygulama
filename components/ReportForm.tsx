@@ -40,54 +40,65 @@ const ReportForm: React.FC<ReportFormProps> = ({ currentUser }) => {
   };
 
   return (
-    <div className="h-full w-full flex items-center justify-center p-6 bg-slate-900 relative overflow-hidden">
+    <div className="h-full w-full flex items-center justify-center p-10 bg-[#050505] relative overflow-hidden scrollbar-hide">
       {/* Background Ambience */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[20%] right-[10%] w-[500px] h-[500px] bg-red-600/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[20%] left-[10%] w-[400px] h-[400px] bg-purple-600/5 rounded-full blur-[100px]"></div>
+        <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] bg-red-500/5 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[60%] bg-purple-500/5 rounded-full blur-[120px]"></div>
       </div>
 
-      <div className="w-full max-w-lg relative z-10">
+      <div className="w-full max-w-2xl relative z-10 animate-fade-in">
         
         {/* Header */}
-        <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Report an Issue</h1>
-            <p className="text-slate-400">Help us improve Nebula by reporting bugs or inappropriate content.</p>
+        <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-6">
+               <div className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></div>
+               <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest">Neural Moderation Active</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase leading-none mb-6">
+               Report <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/40">Issue</span>
+            </h1>
+            <p className="text-slate-400 text-lg font-medium max-w-md mx-auto leading-relaxed">
+               Encountered a bug or inappropriate content? Help us maintain the integrity of our neural network.
+            </p>
         </div>
 
         {/* Card */}
-        <div className="bg-slate-800/50 backdrop-blur-md border border-slate-700/50 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-black border border-white/10 rounded-[2.5rem] p-10 md:p-14 shadow-2xl backdrop-blur-3xl relative group">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500/20 to-purple-500/20 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
           
           {isSuccess ? (
-            <div className="py-12 flex flex-col items-center justify-center text-center animate-fade-in-up">
-              <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mb-4 text-blue-400 border border-blue-500/20">
-                 <Icon name="Check" className="w-8 h-8" />
+            <div className="py-12 flex flex-col items-center justify-center text-center animate-fade-in">
+              <div className="w-20 h-20 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-8 text-blue-400 border border-blue-500/20">
+                 <Icon name="Check" className="w-10 h-10" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Report Submitted</h3>
-              <p className="text-slate-400 max-w-xs">Our team will review your report shortly. Thank you for your feedback.</p>
+              <h3 className="text-3xl font-black text-white tracking-tighter uppercase mb-4">Report Synced</h3>
+              <p className="text-slate-400 max-w-xs mx-auto text-sm leading-relaxed">
+                 Your report has been successfully transmitted to our moderation core. We will review it shortly.
+              </p>
               <button 
                 onClick={() => setIsSuccess(false)}
-                className="mt-6 text-sm text-cyan-400 hover:text-cyan-300 font-medium"
+                className="mt-10 px-8 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-400 transition-all duration-500"
               >
-                Submit another report
+                New Report
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
               
               {/* Report Type */}
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-slate-300">Report Type</label>
-                <div className="grid grid-cols-2 gap-3">
-                    {['Bug', 'Inappropriate Content', 'Copyright', 'Other'].map((type) => (
+              <div className="space-y-4">
+                <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Classification</label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {['Bug', 'Content', 'Copyright', 'Other'].map((type) => (
                         <button
                             key={type}
                             type="button"
                             onClick={() => setReportType(type as any)}
-                            className={`py-2 px-3 rounded-xl text-xs font-medium border transition-all ${
+                            className={`py-4 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all duration-500 ${
                                 reportType === type 
-                                ? 'bg-cyan-500/10 border-cyan-500 text-cyan-400' 
-                                : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:bg-slate-800'
+                                ? 'bg-red-500 text-white border-red-500 shadow-lg shadow-red-500/20' 
+                                : 'bg-white/[0.03] border-white/5 text-slate-500 hover:text-white hover:border-white/20'
                             }`}
                         >
                             {type}
@@ -97,26 +108,26 @@ const ReportForm: React.FC<ReportFormProps> = ({ currentUser }) => {
               </div>
 
               {/* Related ID/URL (Optional) */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-300">Related URL or ID (Optional)</label>
+              <div className="space-y-4">
+                <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Asset Reference (Optional)</label>
                 <input
                     type="text"
                     value={relatedId}
                     onChange={(e) => setRelatedId(e.target.value)}
                     placeholder="e.g. Post ID #123 or URL"
-                    className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder-slate-600"
+                    className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/30 transition-all"
                   />
               </div>
 
               {/* Description */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-300">Description</label>
+              <div className="space-y-4">
+                <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest ml-1">Neural Narrative</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Please describe the issue in detail..."
                   rows={4}
-                  className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder-slate-600 resize-none"
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/30 transition-all resize-none font-medium"
                   required
                 ></textarea>
               </div>
@@ -125,17 +136,17 @@ const ReportForm: React.FC<ReportFormProps> = ({ currentUser }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 rounded-xl font-bold tracking-wide shadow-lg shadow-red-500/10 bg-gradient-to-r from-red-600/80 to-purple-600/80 text-white hover:from-red-500 hover:to-purple-500 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+                className="w-full py-5 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] transition-all duration-700 shadow-2xl bg-white text-black hover:bg-red-400 shadow-white/5 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
               >
                 {isSubmitting ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                    Submitting...
+                    <div className="w-4 h-4 border-2 border-slate-600 border-t-black rounded-full animate-spin"></div>
+                    Syncing...
                   </>
                 ) : (
                   <>
                     <Icon name="Report" className="w-4 h-4" />
-                    Submit Report
+                    Initialize Report
                   </>
                 )}
               </button>

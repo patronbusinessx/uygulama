@@ -1,5 +1,5 @@
 
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI, GenerateContentResponse, HarmCategory, HarmBlockThreshold } from "@google/genai";
 import { GeminiModel } from '../types';
 
 const getAiClient = () => {
@@ -17,10 +17,10 @@ const cleanBase64 = (base64Data: string) => {
 
 // Safety settings to block 18+ content (BLOCK_LOW_AND_ABOVE ensures strict filtering)
 const SAFETY_SETTINGS = [
-  { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-  { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
-  { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-  { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
+  { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE },
+  { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE },
+  { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE },
+  { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE },
 ];
 
 export const streamGeminiResponse = async function* (
@@ -116,5 +116,27 @@ export const generateImageFromText = async (prompt: string, options?: ImageGener
   } catch (error: any) {
     console.error("Gemini Image Gen Error:", error);
     throw new Error(error.message || "Failed to generate image due to safety or API error.");
+  }
+};
+
+export const analyzeImageForGeneration = async (imageBase64: string): Promise<string> => {
+  const ai = getAiClient();
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash', // Efficient vision model
+      contents: {
+        parts: [
+          { inlineData: { mimeType: 'image/jpeg', data: cleanBase64(imageBase64) } },
+          { text: "Describe this image in extreme detail for a photographer. Focus on lighting, composition, colors, subject, and atmosphere. Keep it under 100 words." }
+        ]
+      },
+      config: {
+        safetySettings: SAFETY_SETTINGS
+      }
+    });
+    return response.text || "A high quality artistic image";
+  } catch (error: any) {
+    console.error("Image Analysis Error:", error);
+    throw new Error("Failed to analyze reference image.");
   }
 };
